@@ -8,7 +8,7 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/gavrl/sleep-go-bot/lib/e"
+	"github.com/gavrl/sleep-go-bot/pkg/e"
 )
 
 type Client struct {

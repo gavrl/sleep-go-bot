@@ -1,0 +1,21 @@
+version: '3.9'
+
+volumes:
+  pgdata-dev:
+
+
+services:
+  balance-db-dev:
+    container_name: balance-db-dev
+    image: postgres:14-alpine
+    restart: always
+    volumes:
+      - pgdata-dev:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: ${WORKSPACE_TIMEZONE}
+      PGDATA: /var/lib/postgresql/data/pgdata/
+    ports:
+      - "55432:5432"

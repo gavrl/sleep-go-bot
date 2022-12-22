@@ -1,0 +1,46 @@
+version: '3.9'
+
+networks:
+  tg-sleep-bot:
+
+
+volumes:
+  pgdata:
+
+
+services:
+  tg-sleep-bot-app:
+    container_name: tg-sleep-bot-app
+    build: ./
+    volumes:
+      - ./:/go/src/app
+    environment:
+      POSTGRES_HOST: tg-sleep-bot-db
+      POSTGRES_PORT: 5432
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ./cmd/app/wait-for-postgres.sh -h tg-sleep-bot-db -u ${POSTGRES_USER} -p ${POSTGRES_PASSWORD} -d ${POSTGRES_DB} -c "migrate -path ./internal/store/pg/migrations -database postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@balance-db:5432/${POSTGRES_DB}?sslmode=${POSTGRES_SSL_MODE} up"
+        ./tg-sleep-bot-app
+    depends_on:
+      - tg-sleep-bot-db
+    networks:
+      - tg-sleep-bot
+
+  tg-sleep-bot-db:
+    container_name: tg-sleep-bot-db
+    image: postgres:14-alpine
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: ${WORKSPACE_TIMEZONE}
+      PGDATA: /var/lib/postgresql/data/pgdata/
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      - tg-sleep-bot
