@@ -4,9 +4,10 @@ import (
 	"flag"
 	"log"
 
-	"github.com/gavrl/sleep-go-bot/internal/clients/repository"
 	"github.com/gavrl/sleep-go-bot/internal/clients/telegram"
+	"github.com/gavrl/sleep-go-bot/internal/repository"
 	"github.com/gavrl/sleep-go-bot/util"
+	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -23,7 +24,7 @@ func init() {
 }
 
 func main() {
-	tgClient = telegram.New(tgBotHost, viper.GetString("TELEGRAM_BOT_TOKEN"))
+	_ = telegram.New(tgBotHost, viper.GetString("TELEGRAM_BOT_TOKEN"))
 
 	// fetcher = fetcher.New()
 
@@ -50,7 +51,7 @@ func mustToken() string {
 }
 
 func initDatabase() {
-	db, err := repository.NewPostgresDB(repository.Config{
+	_, err := repository.NewPostgresDB(repository.Config{
 		Host:     "localhost",
 		Port:     "55432",
 		Username: viper.GetString("POSTGRES_USER"),
@@ -62,4 +63,6 @@ func initDatabase() {
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
+
+	logrus.Debug("dump")
 }

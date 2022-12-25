@@ -1,0 +1,1 @@
+drop table sleep_rate;

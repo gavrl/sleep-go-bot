@@ -5,8 +5,8 @@ volumes:
 
 
 services:
-  balance-db-dev:
-    container_name: balance-db-dev
+  sleep-bot-db-dev:
+    container_name: sleep-bot-db-dev
     image: postgres:14-alpine
     restart: always
     volumes:
