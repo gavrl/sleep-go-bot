@@ -8,8 +8,8 @@ import (
 )
 
 type SleepRate interface {
-	Get(dto dto.GetSleepRateDto) (internal.SleepRate, error)
-	Save(dto dto.SaveSleepRateDto) (int, error)
+	Get(dto *dto.GetSleepRateDto) (internal.SleepRate, error)
+	Save(dto *dto.SaveSleepRateDto) (int, error)
 }
 
 type Service struct {

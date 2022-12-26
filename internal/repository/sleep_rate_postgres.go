@@ -16,7 +16,7 @@ func NewSleepRatePostgres(db *sqlx.DB) *SleepRatePostgres {
 	return &SleepRatePostgres{db: db}
 }
 
-func (r *SleepRatePostgres) Save(dto dto.SaveSleepRateDto) (int, error) {
+func (r *SleepRatePostgres) Save(dto *dto.SaveSleepRateDto) (int, error) {
 	var id int
 	saveSleepRateQuery := fmt.Sprintf(
 		"INSERT INTO %s (username, rate, date) VALUES ($1, $2, $3) RETURNING id",
@@ -29,7 +29,7 @@ func (r *SleepRatePostgres) Save(dto dto.SaveSleepRateDto) (int, error) {
 	return id, nil
 }
 
-func (r *SleepRatePostgres) Get(dto dto.GetSleepRateDto) (internal.SleepRate, error) {
+func (r *SleepRatePostgres) Get(dto *dto.GetSleepRateDto) (internal.SleepRate, error) {
 	var sleepRate internal.SleepRate
 	query := fmt.Sprintf(
 		"SELECT id, username, rate, calories, sleep_time, date FROM %s where username = $1 and date = $2",
