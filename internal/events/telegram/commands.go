@@ -16,7 +16,7 @@ type command struct {
 
 const (
 	HelpCmd  = "/help"
-	HelloCmd = "/hello"
+	HelloCmd = "/start"
 )
 
 func (p *Processor) doCmd(cmd *command) error {

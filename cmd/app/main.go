@@ -1,9 +1,13 @@
 package main
 
 import (
-	"github.com/gavrl/sleep-go-bot/internal/clients/telegram"
+	tgClient "github.com/gavrl/sleep-go-bot/internal/clients/telegram"
+	event_consumer "github.com/gavrl/sleep-go-bot/internal/consumer/event-consumer"
+	"github.com/gavrl/sleep-go-bot/internal/events/telegram"
 	"github.com/gavrl/sleep-go-bot/internal/repository"
+	"github.com/gavrl/sleep-go-bot/internal/service"
 	"github.com/gavrl/sleep-go-bot/util"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -12,26 +16,40 @@ import (
 // todo перенести в env
 const (
 	tgBotHost = "api.telegram.org"
+	batchSize = 100
 )
 
 func init() {
 	util.InitConfig()
 	util.InitLogger()
-	initDatabase()
 }
 
 func main() {
-	_ = telegram.New(tgBotHost, viper.GetString("TELEGRAM_BOT_TOKEN"))
+	db := initDatabase()
 
-	// fetcher = fetcher.New()
+	repo := repository.NewRepository(db)
+	service := service.NewService(repo)
 
-	// processor = processor.New()
+	eventsProcessor := telegram.NewProcessor(
+		tgClient.NewClient(tgBotHost, viper.GetString("TELEGRAM_BOT_TOKEN")),
+		service,
+	)
 
-	// consumer.Start(fetcher, processor)
+	logrus.Info("bot started")
+
+	consumer := event_consumer.NewConsumer(
+		eventsProcessor,
+		eventsProcessor,
+		batchSize,
+	)
+
+	if err := consumer.Start(); err != nil {
+		logrus.Fatal("service is stopped", err)
+	}
 }
 
-func initDatabase() {
-	_, err := repository.NewPostgresDB(repository.Config{
+func initDatabase() *sqlx.DB {
+	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     "localhost",
 		Port:     "55432",
 		Username: viper.GetString("POSTGRES_USER"),
@@ -44,5 +62,5 @@ func initDatabase() {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
-	logrus.Debug("dump")
+	return db
 }

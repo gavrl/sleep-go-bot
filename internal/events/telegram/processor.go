@@ -10,7 +10,7 @@ import (
 
 type Processor struct {
 	tg      *telegram.Client
-	service service.Service
+	service *service.Service
 	offset  int
 }
 
@@ -22,11 +22,11 @@ type Meta struct {
 var ErrUnknownEventType = errors.New("unknown event type")
 var ErrUnknownMetaType = errors.New("unknown meta type")
 
-func NewProcessor(tg *telegram.Client, service service.Service) *Processor {
+func NewProcessor(tg *telegram.Client, service *service.Service) *Processor {
 	return &Processor{tg: tg, service: service}
 }
 
-func (p Processor) Fetch(limit int) ([]events.Event, error) {
+func (p *Processor) Fetch(limit int) ([]events.Event, error) {
 	updates, err := p.tg.Updates(p.offset, limit)
 	if err != nil {
 		return nil, e.Wrap("can't get events", err)

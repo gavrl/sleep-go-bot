@@ -2,7 +2,7 @@ package internal
 
 import "time"
 
-const SleepRateDateFormat = "2000-01-01"
+const SleepRateDateFormat = "2006-01-02"
 
 type SleepRate struct {
 	Id        int           `db:"id"`

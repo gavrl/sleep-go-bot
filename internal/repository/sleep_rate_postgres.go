@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 
 	"github.com/gavrl/sleep-go-bot/internal"
 	"github.com/gavrl/sleep-go-bot/internal/dto"
@@ -22,6 +23,7 @@ func (r *SleepRatePostgres) Save(dto *dto.SaveSleepRateDto) (int, error) {
 		"INSERT INTO %s (username, rate, date) VALUES ($1, $2, $3) RETURNING id",
 		sleepRateTable,
 	)
+	logrus.Debug(dto.Time.Format(internal.SleepRateDateFormat))
 	row := r.db.QueryRow(saveSleepRateQuery, dto.UserName, dto.Rate, dto.Time.Format(internal.SleepRateDateFormat))
 	if err := row.Scan(&id); err != nil {
 		return 0, err
